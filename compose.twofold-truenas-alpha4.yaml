@@ -1,0 +1,51 @@
+# TrueNAS reference example. Replace 192.168.1.10 with your NAS address.
+# Keep your existing working compose.yaml when upgrading.
+services:
+  twofold:
+    build:
+      context: ./server
+    container_name: twofold
+    restart: unless-stopped
+    user: "10001:10001"
+
+    environment:
+      TWOFOLD_IMMICH_URL: "http://192.168.1.10:2283"
+      TWOFOLD_IMMICH_ALLOW_LOCAL_HTTP: "true"
+      TWOFOLD_IMMICH_API_KEY_FILE: /run/secrets/immich_api_key
+      TWOFOLD_IMMICH_ALBUM_ID: ""
+      TWOFOLD_IMMICH_ALBUM_NAME: "Twofold"
+      # Optional: your ntfy HTTPS origin, without a topic or path.
+      TWOFOLD_NTFY_URL: ""
+
+    volumes:
+      - ./data:/data
+
+    secrets:
+      - immich_api_key
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    mem_limit: 160m
+    pids_limit: 64
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+    ports:
+      - "192.168.1.10:10001:8080"
+
+secrets:
+  immich_api_key:
+    file: ./immich_api_key

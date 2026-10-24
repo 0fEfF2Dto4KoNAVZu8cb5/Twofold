@@ -1,0 +1,27 @@
+/data/
+/exports/
+/secrets/
+/.env
+*.jks
+*.keystore
+*.p12
+*.apk
+*.aab
+*.sqlite3*
+__pycache__/
+.venv/
+android/.gradle/
+android/local.properties
+android/**/build/
+*.tar.gz
+
+# Local development and signing material
+.idea/
+.vscode/
+*.log
+*.pem
+*.key
+/password.txt
+
+# Only the intentionally published signed release belongs in Git.
+!/downloads/*.apk

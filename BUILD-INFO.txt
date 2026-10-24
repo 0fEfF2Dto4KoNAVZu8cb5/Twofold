@@ -1,0 +1,84 @@
+Twofold 0.1.0-alpha.4 — shared rounds, simpler UI, reminders and optional ntfy
+Build date: 2026-10-24 UTC
+Package: org.twofold.app
+versionCode: 3; Android minimum API 26; compile/target API 35
+Release APK: Twofold-0.1.0-alpha.4.apk
+Release APK size: 228608 bytes
+APK SHA-256: 407cf94d93fc6579a9d2daae7cf5446e6cc582fba89ca55021bcead055ca20c9
+Signing certificate SHA-256:
+b093f453e2c3ef6b5d410a5faf913eb28226083002ab6668594fb6c758a646f9
+The signing identity matches the previous supplied alpha APKs. Install over the
+existing app on both phones, without uninstalling, to preserve pairing.
+
+Original delivered source-tree SHA-256 (relative path + NUL + file SHA-256 bytes, sorted path order;
+excludes BUILD-INFO.txt, build outputs, caches, local.properties, data and secrets):
+603e659d9d7fa0545178dc20fe1d1a1d56dbe571d0fafce241239a4ff60305ee
+The public repository generalizes deployment examples and adds download links;
+its documentation/archive bytes therefore differ from that original tree.
+The Android and Python application source and the signed APK are unchanged.
+
+Build tools: JDK 17, Gradle 8.13, Android Gradle Plugin 8.13.2,
+Android SDK platform 35, build-tools 35.0.0.
+Android runtime: AndroidX ExifInterface 1.4.2 and UnifiedPush connector 3.3.5,
+with FOSS transitive dependencies listed in NOTICE. No FCM/Play services SDK.
+Python image: python:3.13-slim; requirements pinned in server/requirements.txt.
+
+Completed checks:
+- 32 Python server tests passed. TLS Immich fixture: byte-identical original
+  metadata, XMP, album membership, retry/retention, auth, SSE and backups.
+- Shared rounds: server-side media/history redaction, blurred previews,
+  simultaneous upload, retake/idempotence, restart/pruning and legacy migration.
+- ntfy TLS fixture: real RFC 8291 encryption/decryption, endpoint allowlist,
+  verified challenge, own-device auth, failed publication retry and revocation.
+- 10 Robolectric API 35 tests passed using native graphics and Android framework
+  code: layout/corners, original bytes, outbox, notification deduplication,
+  follow-up/opt-outs, encrypted callback filtering/backoff, widget clearing,
+  home/review controls and rendered-screen inspection. A test-only Vault shadow
+  supplies fixture credentials; hardware Keystore is not tested by Robolectric.
+- Native Java host checks passed for tokens, HTTPS-only URLs, JSON, multipart,
+  authentication errors and redirect rejection.
+- assembleDebug, assembleDebugAndroidTest, assembleRelease and lint passed.
+  Lint reports 0 errors and 27 warnings (SDK/dependency versions, battery-policy
+  prompt, orientation, hardcoded English, unused resources/API guidance).
+  Build reports deprecated Android/Gradle API usage. No warning is a device pass.
+- Signed release verified with APK v2/v3 signatures and original certificate;
+  non-debuggable, expected version, no microphone/background location permission,
+  no FCM/Play-services code or test credential strings in release DEX.
+- Generic and NAS reference Compose validated against the official Compose schema.
+  The public NAS reference preserves the deployment structure and uses an
+  example address, with an optional initially empty TWOFOLD_NTFY_URL setting.
+- All Python source parsed; release archives checked for expected content and
+  exclusions. Dockerfile retains UID 10001 import and source-permission checks.
+
+Not completed in this environment:
+- Actual ntfy Android distributor IPC / background delivery on physical phones.
+- Physical GrapheneOS/stock Android camera, GPS, orientation and concurrency.
+- Overnight standby, reboot/vendor policy or measured battery use.
+- Android instrumentation runner: test APK builds, but the AOSP emulator did not
+  boot during the earlier bounded attempt. Its device assertions did not run.
+- Docker execution (no daemon here) or this update against the live NAS/Immich.
+  An earlier server version was confirmed working by the user on that NAS.
+
+Behavior and limits:
+- Share-to-reveal is an optional shared interaction rule. Trusted server/admin
+  and Immich access remain outside it. Blurred previews reveal coarse colors.
+- Incoming turn reminder + at most one optional inexact follow-up around one hour.
+  Android may delay work. No random daily prompt, exact alarm or battery benchmark.
+- ntfy is optional per phone. It carries encrypted generic sync hints/challenges;
+  photos and metadata travel directly over Twofold HTTPS. Periodic recovery stays.
+- Database changes are additive at startup. Take a stopped-service backup/snapshot
+  before upgrading. Retention remains latest sets plus pending Immich uploads;
+  small receipt and round records remain for retry/unlock correctness.
+- Raw originals/full metadata behavior is retained. GPS starts off. Actual camera
+  fields depend on the hardware. Concurrent mode does not guarantee synchronized
+  exposures. Missing or previously stripped metadata cannot be reconstructed.
+- Both raw JPEGs stay separate; chosen main/inset layout is stored in JSON/XMP and
+  used for the app/widget preview. Immich displays only supported metadata fields.
+
+Read UPDATE.txt, NTFY-SETUP.txt, README.md, docs/PRIVACY.md and docs/TESTING.md.
+Source excludes API keys, retained photos, signing secrets, SDK paths and caches.
+Keep the existing separate private signing backup for future updates.
+
+Deployment feedback, 2026-10-24: the maintainer confirmed ntfy registration and
+photo notifications working on the self-hosted installation. This is user-reported
+acceptance feedback; it does not replace the outstanding camera/standby/battery tests.

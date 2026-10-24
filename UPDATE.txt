@@ -1,0 +1,72 @@
+Twofold 0.1.0-alpha.4 — shared moments, simpler screens and optional ntfy
+
+This ZIP replaces server/ and includes documentation and licenses. It does not
+replace compose.yaml, data/ or your Immich API key. The separately named
+compose.twofold-truenas-alpha4.yaml is a reference copy for your current NAS.
+Corresponding Android/server source is in the separate source ZIP.
+
+1. Before upgrading, take a stopped-service backup or TrueNAS dataset snapshot.
+   Startup adds rounds, round membership and push tables plus a posts column.
+   Existing accounts, photos and archive progress are preserved. A filesystem
+   snapshot/backup is needed to roll the database back to an older release.
+
+   Optional built-in backup, before extracting the update:
+
+   cd /mnt/tank/apps/twofold
+   sudo docker compose -p ix-twofold stop twofold
+   sudo docker compose -p ix-twofold run --rm --no-deps twofold python -m twofold.admin backup /data/twofold-before-alpha4.tar.gz
+
+   Choose a different backup filename if it already exists. Backups contain raw
+   photos and private configuration; keep them private. Back up Immich separately.
+
+2. Put Twofold-server-0.1.0-alpha.4.zip in that directory, then run:
+
+   cd /mnt/tank/apps/twofold
+   sudo unzip -o Twofold-server-0.1.0-alpha.4.zip
+   sudo docker compose -p ix-twofold config --quiet
+   sudo docker compose -p ix-twofold up -d --build --force-recreate --wait twofold
+   curl --fail http://192.168.1.10:10001/healthz
+
+   Keep the existing Compose project, UID 10001:10001, port mapping, /data volume,
+   read-only filesystem and /run/secrets/immich_api_key path. Source permissions
+   are normalized during the Docker build. Existing Immich permissions stay:
+   asset.upload + albumAsset.create; album.create only for automatic album creation.
+
+3. Install Twofold-0.1.0-alpha.4.apk over the existing app on BOTH phones.
+   Do not uninstall. The package and signing key are unchanged; versionCode is 3.
+   Open the app once after installation. Pairing and the Immich album remain.
+
+4. Daily use: Take a moment -> capture front + back -> Swap if desired -> choose
+   the inset corner -> optional note -> Share moment. Layout changes the combined
+   preview; both original JPEGs and full metadata still go to Immich separately.
+   The widget fits the complete preview so any chosen inset corner stays visible.
+
+5. New moments use shared rounds by default. First person posts; their partner
+   sees a blurred preview and is invited to reply. Once both post in that round,
+   both sets are visible. Retakes before a reply remain in the same round. A new
+   upload after completion opens the next round. Old pre-update posts stay visible.
+   Settings > Share to reveal changes the rule for both accounts. Immich/admin
+   access remains outside this rule. Imported photos also count as a reply.
+
+6. Reminders: allow Android notifications. Settings lets each person disable the
+   initial turn reminder or its one gentle follow-up around an hour later.
+   Replying cancels the follow-up. Android standby/network policy can delay it.
+   No fixed daily prompt or exact alarm is implemented in this release.
+
+7. Optional ntfy: read NTFY-SETUP.txt. Add TWOFOLD_NTFY_URL with your ntfy HTTPS
+   origin under the existing service's environment and recreate the container.
+   In the phone app use Settings > Photo delivery > ntfy. The official ntfy app
+   must be installed and configured first. Each phone chooses independently;
+   your girlfriend can keep Direct and does not need ntfy. Empty/unset server
+   configuration keeps Direct/Periodic working and disables the push publisher.
+
+Camera/GPS/Immich metadata behavior from alpha.3 is retained. Location starts off,
+uses foreground satellite GPS only, and stops after a fix or 45-second search.
+Concurrent front/back capture depends on real hardware and is not an exposure-
+synchronization guarantee. Previously stripped metadata cannot be reconstructed.
+
+Validation: 32 server tests, 10 Robolectric Android framework tests, and native
+Java HTTPS/token host checks pass. Android builds and lint pass with warnings.
+Encrypted push tests use a local TLS fixture and real RFC 8291 decryption. This
+is not a real-phone ntfy, camera, standby or battery test. Docker cannot be run
+in the build environment; check container health on your NAS and test both phones.

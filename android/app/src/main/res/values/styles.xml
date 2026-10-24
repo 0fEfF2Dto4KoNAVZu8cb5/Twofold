@@ -1,0 +1,17 @@
+<resources>
+    <style name="AppThemeBase" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#D7F6A3</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">#0D0E11</item>
+        <item name="android:navigationBarColor">#0D0E11</item>
+        <item name="android:statusBarColor">#0D0E11</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+    <style name="AppTheme" parent="AppThemeBase" />
+    <string name="widget_description">Your partner’s latest photo, kept on your home screen.</string>
+    <string name="widget_photo_description">Your partner’s latest moment</string>
+    <string name="widget_empty">Twofold\nYour next little moment</string>
+    <string name="delivery_direct">Direct updates + periodic recovery</string>
+    <string name="delivery_periodic">Periodic checks only</string>
+</resources>

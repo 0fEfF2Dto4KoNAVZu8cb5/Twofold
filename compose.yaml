@@ -1,0 +1,28 @@
+services:
+  twofold:
+    build: ./server
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8088:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      TWOFOLD_IMMICH_URL: ${IMMICH_URL:-}
+      TWOFOLD_IMMICH_ALLOW_LOCAL_HTTP: ${IMMICH_ALLOW_LOCAL_HTTP:-false}
+      TWOFOLD_IMMICH_ALBUM_ID: ${IMMICH_ALBUM_ID:-}
+      TWOFOLD_IMMICH_ALBUM_NAME: ${IMMICH_ALBUM_NAME:-Twofold}
+      TWOFOLD_IMMICH_API_KEY_FILE: /run/secrets/immich_api_key
+      TWOFOLD_NTFY_URL: ${NTFY_URL:-}
+    secrets:
+      - immich_api_key
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 160m
+    pids_limit: 64
+secrets:
+  immich_api_key:
+    file: ./secrets/immich_api_key

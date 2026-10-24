@@ -1,0 +1,42 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'org.twofold.app'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'org.twofold.app'
+        minSdk 26
+        targetSdk 35
+        versionCode 3
+        versionName '0.1.0-alpha.4'
+        testInstrumentationRunner 'org.twofold.app.DeviceChecks'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            maxHeapSize = '1536m'
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+            ['http.proxyHost','http.proxyPort','https.proxyHost','https.proxyPort','javax.net.ssl.trustStore'].each { name ->
+                if (System.getProperty(name) != null) systemProperty name, System.getProperty(name)
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+dependencies {
+    implementation 'androidx.exifinterface:exifinterface:1.4.2'
+    implementation 'org.unifiedpush.android:connector:3.3.5'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
+}
+// AndroidX EXIF is Apache-2.0 FOSS. No Google Play services, analytics, or advertising SDKs.

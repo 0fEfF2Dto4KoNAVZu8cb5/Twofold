@@ -1,0 +1,87 @@
+Optional ntfy delivery — Twofold 0.1.0-alpha.4
+
+You can use ntfy on your phone while your partner keeps Direct delivery. Periodic
+recovery remains in every mode. No FCM, Google account, Firebase project, ntfy
+API token, or Immich change is required for Twofold's UnifiedPush publisher.
+
+1. Server URL
+
+Use the HTTPS origin of your existing ntfy server, reachable by BOTH the NAS and
+any phone using ntfy. It is a separate address from your Twofold HTTPS URL. For
+example, https://notify.example.com (replace with your real hostname). The ntfy
+server's base-url and Android app's default server should use the same origin.
+Twofold requires a valid TLS certificate and no interactive login/redirect in
+front of ntfy's publish/subscribe endpoints. Cloudflared can provide HTTPS.
+
+In your EXISTING /mnt/tank/apps/twofold/compose.yaml, add this under
+services.twofold.environment, replacing the example hostname:
+
+  TWOFOLD_NTFY_URL: "https://notify.example.com"
+
+Use only the origin, without a topic, path or embedded login. If using the generic
+source-tree compose.yaml, set NTFY_URL in .env instead. The NAS reference Compose
+contains an empty TWOFOLD_NTFY_URL value intentionally; fill it to enable ntfy.
+
+Recreate after editing:
+
+  cd /mnt/tank/apps/twofold
+  sudo docker compose -p ix-twofold config --quiet
+  sudo docker compose -p ix-twofold up -d --build --force-recreate --wait twofold
+
+2. Private ntfy access rules
+
+If your ntfy server already supports UnifiedPush, keep its working rules. If it
+uses deny-all authentication, the phone's ntfy account needs read access to its
+UnifiedPush topics and the application server needs anonymous publish access.
+The upstream documented pattern is:
+
+  ntfy access '*' 'up*' write-only
+
+For your existing container named ntfy, the equivalent command is:
+
+  sudo docker exec ntfy ntfy access '*' 'up*' write-only
+
+This applies to up* topics on that ntfy instance. It permits anonymous publishing,
+not anonymous reading. Use a narrower topic rule if you already manage individual
+UnifiedPush topics. Do not change other private topic rules or share endpoint URLs.
+The phone's existing ntfy account can be configured in ntfy Settings > Manage
+users. Twofold itself stores no ntfy account password or publisher API token.
+
+3. On each phone that wants ntfy
+
+- Install/open the official FOSS ntfy Android app (io.heckel.ntfy).
+- Set its default server to the same HTTPS origin. Configure the account there
+  if required by your ntfy server. Allow its background connection as needed.
+- Open Twofold, refresh, then Settings > Photo delivery > ntfy.
+- Wait for the reconnect row to say "ntfy connected". The app verifies an encrypted
+  round trip before using that registration for updates. If setup is incomplete,
+  it shows a generic status and periodic checks continue.
+- Send a new moment from the other phone with this phone locked. Confirm the turn
+  reminder and blurred widget, reply, then check that both photos unlock.
+
+The other phone can use Settings > Photo delivery > Direct, without installing
+ntfy. Direct has a quiet ongoing notification. Periodic-only is also available;
+updates may arrive later. Force-stop requires reopening the app in every mode.
+
+4. Privacy and troubleshooting
+
+Only RFC 8291 encrypted {"event":"sync"} messages pass through ntfy, plus a random
+registration challenge during setup. No photo, caption, name, GPS, Twofold token
+or Immich key is included. Actual photos are fetched over Twofold HTTPS. ntfy and
+its proxy can still observe topic URLs, network addresses and message timing.
+
+If ntfy is disabled in Twofold: verify the environment value, recreate the service,
+open ntfy once, then refresh/reopen Twofold's delivery page. Reconnect after fixing
+server URL or account permissions. Endpoint origin must match TWOFOLD_NTFY_URL.
+A 401/403 publish error usually means ntfy publish permissions or an extra proxy
+login; redirects are rejected. A DNS/TLS error can mean the NAS cannot reach that
+public hostname. Never paste capability topic URLs or credentials into support logs.
+
+If delivery is delayed: check Android notification permission and background policy
+for ntfy and Twofold. Periodic recovery can still fetch photos. This alpha makes no
+instant-delivery or measured battery-use guarantee.
+
+References:
+https://unifiedpush.org/users/distributors/ntfy/
+https://docs.ntfy.sh/config/#access-control
+https://unifiedpush.org/kdoc/connector/
